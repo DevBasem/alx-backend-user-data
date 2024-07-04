@@ -4,8 +4,10 @@ filtered_logger.py
 """
 
 import logging
-import re
+import csv
 from typing import List
+
+PII_FIELDS = ("name", "email", "phone", "address", "credit_card")
 
 
 def filter_datum(fields: List[str], redaction: str, message: str,
@@ -47,3 +49,24 @@ class RedactingFormatter(logging.Formatter):
             self.fields, self.REDACTION,
             message, self.SEPARATOR
         )
+
+
+def get_logger() -> logging.Logger:
+    """
+    Returns a logging.Logger object named "user_data".
+    """
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+
+    # Prevent propagation of log messages to other loggers
+    logger.propagate = False
+
+    # Create a StreamHandler with RedactingFormatter
+    stream_handler = logging.StreamHandler()
+    formatter = RedactingFormatter(fields=PII_FIELDS)
+    stream_handler.setFormatter(formatter)
+
+    # Add StreamHandler to logger
+    logger.addHandler(stream_handler)
+
+    return logger
