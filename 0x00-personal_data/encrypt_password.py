@@ -2,10 +2,12 @@
 """
 encrypt_password.py
 
-Module for hashing passwords securely using bcrypt and validating hashed passwords.
+Module for hashing passwords securely using bcrypt
+and validating hashed passwords.
 """
 
 import bcrypt
+
 
 def hash_password(password: str) -> bytes:
     """
@@ -19,8 +21,9 @@ def hash_password(password: str) -> bytes:
     """
     salt = bcrypt.gensalt()
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
-    
+
     return hashed_password
+
 
 def is_valid(hashed_password: bytes, password: str) -> bool:
     """
