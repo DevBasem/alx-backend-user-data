@@ -20,20 +20,8 @@ def filter_datum(fields, redaction, message, separator):
     Returns:
     - str: Log message with specified fields obfuscated.
     """
-    pattern = r'([^{}=;]+)=([^{}=;]*)'.format(separator, separator)
-
-    def obfuscate_field(match):
-        """
-        Helper function to obfuscate a matched field.
-        """
-        field_name = match.group(1)
-        field_value = match.group(2)
-
-        if field_name in fields:
-            return field_name + '=' + redaction
-        else:
-            return field_name + '=' + field_value
-
-    return separator.join(
-        [obfuscate_field(m) for m in re.finditer(pattern, message)]
+    return re.sub(
+        r'([^{}=;]+)=([^{}=;]*)'.format(separator, separator),
+        lambda match: match.group(1) + '=' + redaction if match.group(1) in fields else match.group(0),
+        message
     )
