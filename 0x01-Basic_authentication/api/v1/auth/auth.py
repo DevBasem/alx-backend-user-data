@@ -20,7 +20,7 @@ class Auth:
             exclude from authentication.
             Paths may include * as a wildcard at the end.
         Returns:
-            bool: True if authentication is required, False otherwise.
+        bool: True if authentication is required, False otherwise.
         """
         for excluded_path in excluded_paths:
             if excluded_path.endswith('*'):
