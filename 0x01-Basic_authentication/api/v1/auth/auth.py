@@ -3,33 +3,32 @@
 Auth module for API authentication
 """
 
-from flask import request
-from typing import List, TypeVar
-
+from typing import List
 
 class Auth:
     """Template for all authentication system"""
 
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
         """
-        Check if a path requires authentication
+        Check if a path requires authentication based on excluded paths.
 
         Args:
-            path (str): The path to check
+            path (str): The path to check.
+            excluded_paths (List[str]): List of paths to exclude from authentication.
+                                        Paths may include * as a wildcard at the end.
 
         Returns:
-            bool: True if authentication is required, False otherwise
+            bool: True if authentication is required, False otherwise.
         """
-        if path is None or excluded_paths is None or not excluded_paths:
+        if not path or not excluded_paths:
             return True
 
-        if path[-1] != '/':
-            path += '/'
-
         for excluded_path in excluded_paths:
-            if excluded_path[-1] != '/':
-                excluded_path += '/'
-            if path == excluded_path:
+            if excluded_path.endswith('*'):
+                prefix = excluded_path.rstrip('*')
+                if path.startswith(prefix):
+                    return False
+            elif path == excluded_path:
                 return False
 
         return True
