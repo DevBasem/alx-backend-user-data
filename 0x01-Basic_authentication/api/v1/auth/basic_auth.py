@@ -6,6 +6,8 @@ from api.v1.auth.auth import Auth
 
 import base64
 
+from api.v1.auth.auth import Auth
+from api.v1.auth.basic_auth import BasicAuth
 from models.user import User
 
 
@@ -13,6 +15,7 @@ class BasicAuth(Auth):
     """
     BasicAuth class that inherits from Auth
     """
+
     def extract_base64_authorization_header(
         self, authorization_header: str
     ) -> str:
@@ -120,3 +123,39 @@ class BasicAuth(Auth):
             return None
 
         return user
+
+    def current_user(self, request=None) -> User:
+        """
+        Retrieves the User instance for a request using Basic Authentication
+
+        Args:
+            request (flask.Request, optional): The Flask request object.
+                Defaults to None.
+
+        Returns:
+            User: The User instance if authenticated, None otherwise
+        """
+        if request is None:
+            return None
+
+        auth_header = request.headers.get('Authorization')
+
+        if not auth_header:
+            return None
+
+        base64_part = self.extract_base64_authorization_header(auth_header)
+
+        if not base64_part:
+            return None
+
+        decoded_str = self.decode_base64_authorization_header(base64_part)
+
+        if not decoded_str:
+            return None
+
+        email, password = self.extract_user_credentials(decoded_str)
+
+        if not email or not password:
+            return None
+
+        return self.user_object_from_credentials(email, password)
