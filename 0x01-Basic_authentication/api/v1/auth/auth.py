@@ -5,54 +5,35 @@ Auth module for API authentication
 
 from flask import request
 from typing import List, TypeVar
+import fnmatch
 
 
 class Auth:
-    """Template for all authentication system"""
-
+    """Authentication class.
+    """
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
+        """ Method to check if auth is required.
         """
-        Checks if a path requires authentication based on excluded paths.
+        if path is None:
+            return True
 
-        Args:
-            path (str): The path to check.
-            excluded_paths (List[str]): List of paths to
-            exclude from authentication.
-            Paths may include * as a wildcard at the end.
-        Returns:
-        bool: True if authentication is required, False otherwise.
-        """
+        if excluded_paths is None or not excluded_paths:
+            return True
+
         for excluded_path in excluded_paths:
-            if excluded_path.endswith('*'):
-                prefix = excluded_path.rstrip('*')
-                if path.startswith(prefix):
-                    return False
-            elif path == excluded_path:
+            if fnmatch.fnmatch(path, excluded_path):
                 return False
+
         return True
 
     def authorization_header(self, request=None) -> str:
+        """ Method to get authorization header.
         """
-        Get the authorization header from the request
-
-        Args:
-            request (flask.Request): The Flask request object
-
-        Returns:
-            str: The authorization header, or None if not present
-        """
-        if request is None or 'Authorization' not in request.headers:
-            return None
-        return request.headers.get('Authorization')
+        if request is not None:
+            return request.headers.get('Authorization', None)
+        return None
 
     def current_user(self, request=None) -> TypeVar('User'):
-        """
-        Get the current user from the request
-
-        Args:
-            request (flask.Request): The Flask request object
-
-        Returns:
-            TypeVar('User'): None since no user is identified (placeholder)
+        """ Method to get user from request.
         """
         return None
