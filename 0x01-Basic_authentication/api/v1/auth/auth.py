@@ -9,6 +9,7 @@ from typing import List, TypeVar
 
 class Auth:
     """Template for all authentication system"""
+
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
         """
         Check if a path requires authentication
@@ -41,9 +42,11 @@ class Auth:
             request (flask.Request): The Flask request object
 
         Returns:
-            str: None since no authorization header is provided (placeholder)
+            str: The authorization header, or None if not present
         """
-        return None
+        if request is None:
+            return None
+        return request.headers.get('Authorization')
 
     def current_user(self, request=None) -> TypeVar('User'):
         """
