@@ -9,22 +9,19 @@ from typing import List, TypeVar
 
 class Auth:
     """Template for all authentication system"""
-
-
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
         """
         Check if a path requires authentication
 
         Args:
             path (str): The path to check
-            excluded_paths (List[str]): List of paths that do not require authentication
 
         Returns:
             bool: True if authentication is required, False otherwise
         """
         if path is None or excluded_paths is None or not excluded_paths:
             return True
-        
+
         if path[-1] != '/':
             path += '/'
 
@@ -35,7 +32,6 @@ class Auth:
                 return False
 
         return True
-
 
     def authorization_header(self, request=None) -> str:
         """
@@ -48,7 +44,6 @@ class Auth:
             str: None since no authorization header is provided (placeholder)
         """
         return None
-
 
     def current_user(self, request=None) -> TypeVar('User'):
         """
