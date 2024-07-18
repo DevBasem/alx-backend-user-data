@@ -1,10 +1,40 @@
 #!/usr/bin/env python3
+"""Module for authentication.
 """
-Auth module
-"""
+
+
+import logging
+from typing import Union
+from uuid import uuid4
+
+import bcrypt
+from sqlalchemy.orm.exc import NoResultFound
+
 from db import DB
 from user import User
-from sqlalchemy.orm.exc import NoResultFound
+
+logging.disable(logging.WARNING)
+
+
+def _hash_password(password: str) -> bytes:
+    """Hashes a password and returns bytes.
+
+    Args:
+        password (str): The password to be hashed.
+
+    Returns:
+        bytes: The hashed password.
+    """
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+
+
+def _generate_uuid() -> str:
+    """Generates a uuid.
+
+    Returns:
+        str: string representation of a new UUID.
+    """
+    return str(uuid4())
 
 
 class Auth:
@@ -15,25 +45,28 @@ class Auth:
         self._db = DB()
 
     def register_user(self, email: str, password: str) -> User:
-        """Register a new user if email does not exist,
-        otherwise raise ValueError
+        """Registers a new user with the given email and password.
+
+        Args:
+            email (str): The email of the new user.
+            password (str): The password of the new user.
+
+        Returns:
+            User: A User object representing the newly created user.
+
+        Raises:
+            ValueError: If a user with the given email already exists.
         """
         try:
-            # Check if the user already exists
+            # Search for the user by email
             self._db.find_user_by(email=email)
+            # If a user already exist with the passed email, raise a ValueError
             raise ValueError(f"User {email} already exists")
         except NoResultFound:
-            # Hash the password
-            hashed_password = self._hash_password(password)
-            # Add the user to the database
-            user = self._db.add_user(email, hashed_password)
-            return user
-
-    def _hash_password(self, password: str) -> bytes:
-        """Hashes a password using bcrypt.hashpw
-        """
-        import bcrypt
-        # Generate a salt and hash the password
-        salt = bcrypt.gensalt()
-        hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
-        return hashed_password
+            pass
+        # If not, hash the password with _hash_password
+        hashed_password = _hash_password(password)
+        # Save the user to the database using self._db
+        user = self._db.add_user(email, hashed_password)
+        # Return the User object
+        return user
