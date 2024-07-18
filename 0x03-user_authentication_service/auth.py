@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Module for authentication.
 """
-
+Auth module
+"""
 
 import logging
 from typing import Union
